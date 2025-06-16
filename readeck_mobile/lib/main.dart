@@ -26,6 +26,95 @@ void main() async {
 }
 
 final _router = GoRouter(
+  initialLocation: '/',
+  debugLogDiagnostics: true,
+  redirect: (context, state) {
+    // 無効なパスの場合はホームにリダイレクト
+    final validPaths = ['/', '/bookmarks', '/labels', '/collections', '/settings', '/login'];
+    final path = state.fullPath ?? state.path ?? '/';
+    
+    if (path.startsWith('/bookmark/')) {
+      // ブックマーク詳細のパスは有効
+      return null;
+    }
+    
+    if (!validPaths.contains(path) && !path.startsWith('/bookmark/')) {
+      print('Invalid path detected: $path, redirecting to home');
+      return '/';
+    }
+    
+    return null; // リダイレクトしない
+  },
+  errorBuilder: (context, state) {
+    print('Go Router Error: ${state.error}');
+    print('URI: ${state.uri}');
+    print('Path: ${state.path}');
+    print('Full path: ${state.fullPath}');
+    
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('ナビゲーションエラー'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            try {
+              if (context.canPop()) {
+                context.pop();
+              } else {
+                context.go('/');
+              }
+            } catch (e) {
+              print('Navigation error: $e');
+              context.go('/');
+            }
+          },
+        ),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.error, size: 64, color: Colors.red),
+            const SizedBox(height: 16),
+            Text(
+              'ナビゲーションエラーが発生しました',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            const SizedBox(height: 8),
+            Text('Error: ${state.error?.toString() ?? "Unknown error"}'),
+            const SizedBox(height: 8),
+            Text('URI: ${state.uri}'),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    try {
+                      if (context.canPop()) {
+                        context.pop();
+                      } else {
+                        context.go('/');
+                      }
+                    } catch (e) {
+                      print('Navigation error: $e');
+                      context.go('/');
+                    }
+                  },
+                  child: const Text('戻る'),
+                ),
+                const SizedBox(width: 16),
+                ElevatedButton(
+                  onPressed: () => context.go('/'),
+                  child: const Text('ホームに戻る'),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  },
   routes: [
     GoRoute(
       path: '/',
@@ -1163,11 +1252,31 @@ class SettingsScreen extends StatelessWidget {
             padding: const EdgeInsets.all(24),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
+              children: [                Row(
                   children: [
                     IconButton.filled(
-                      onPressed: () => Navigator.pop(context),
+                      onPressed: () {
+                        try {
+                          print('Settings: Attempting to navigate back');
+                          if (Navigator.of(context).canPop()) {
+                            print('Settings: Using Navigator.pop()');
+                            Navigator.of(context).pop();
+                          } else if (context.canPop()) {
+                            print('Settings: Using context.pop()');
+                            context.pop();
+                          } else {
+                            print('Settings: Using context.go("/")');
+                            context.go('/');
+                          }
+                        } catch (e) {
+                          print('Settings navigation error: $e');
+                          try {
+                            context.go('/');
+                          } catch (e2) {
+                            print('Settings fallback navigation error: $e2');
+                          }
+                        }
+                      },
                       icon: const Icon(Icons.arrow_back_rounded),
                     ),
                     const SizedBox(width: 16),
