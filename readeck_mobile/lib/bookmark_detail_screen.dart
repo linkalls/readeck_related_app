@@ -155,7 +155,8 @@ class BookmarkDetailScreen extends HookConsumerWidget {
                 ),
                 // コンテンツ
                 Expanded(
-                  child: markdownAsync.when(                    data: (markdown) => Padding(
+                  child: markdownAsync.when(
+                    data: (markdown) => Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: MarkdownWidget(
                         data: markdown,
@@ -428,7 +429,8 @@ class BookmarkDetailScreen extends HookConsumerWidget {
           if (await canLaunchUrl(uri)) {
             await launchUrl(uri, mode: LaunchMode.externalApplication);
           }
-        }        break;
+        }
+        break;
     }
   }
 
@@ -436,7 +438,7 @@ class BookmarkDetailScreen extends HookConsumerWidget {
   MarkdownConfig _buildMarkdownConfig(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final theme = Theme.of(context);
-    
+
     return MarkdownConfig(
       configs: [
         // Pre（コードブロック）の設定
@@ -512,7 +514,7 @@ class BookmarkDetailScreen extends HookConsumerWidget {
             color: isDark ? Colors.orange[300] : Colors.orange[800],
             backgroundColor: isDark ? Colors.grey[800] : Colors.grey[200],
           ),
-        ),        // 引用ブロックの設定
+        ), // 引用ブロックの設定
         BlockquoteConfig(
           padding: const EdgeInsets.all(12),
           margin: const EdgeInsets.symmetric(vertical: 8),
