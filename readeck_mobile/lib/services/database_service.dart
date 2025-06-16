@@ -169,24 +169,42 @@ class DatabaseService {
     if (maps.isEmpty) return null;
     return _mapToBookmarkSummary(maps.first);
   }
-
   // ブックマークの詳細コンテンツを保存
   static Future<void> saveBookmarkContent(String id, String content) async {
     final db = await database;
+    print('💾 Saving content for bookmark: "$id" (${content.length} chars)');
 
     // まず該当ブックマークが存在するかチェック
     final existing = await db.query(
       'bookmarks',
-      columns: ['id'],
+      columns: ['id', 'title'],
       where: 'id = ?',
       whereArgs: [id],
       limit: 1,
     );
 
     if (existing.isEmpty) {
-      print('Cannot save content: bookmark $id not found in database');
+      print('❌ Cannot save content: bookmark $id not found in database');
+      print('🔧 Creating new bookmark entry...');
+      
+      // ブックマークが存在しない場合は新規作成
+      await db.insert(
+        'bookmarks',
+        {
+          'id': id,
+          'title': 'Cached Content',
+          'content': content,
+          'sync_status': 1,
+          'created_at': DateTime.now().toIso8601String(),
+        },
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+      print('✅ Created new bookmark with content: $id');
       return;
     }
+
+    final bookmark = existing.first;
+    print('📊 Found existing bookmark: "${bookmark['title']}" (ID: "${bookmark['id']}")');
 
     final result = await db.update(
       'bookmarks',
@@ -196,63 +214,92 @@ class DatabaseService {
     );
 
     if (result > 0) {
-      print(
-        'Successfully saved content for bookmark $id: ${content.length} characters',
-      );
+      print('✅ Successfully saved content for bookmark "$id": ${content.length} characters');
+      
+      // 保存後の確認
+      final verification = await hasBookmarkContent(id);
+      print('🔍 Verification - hasBookmarkContent: $verification');
     } else {
-      print('Failed to update content for bookmark $id');
+      print('❌ Failed to update content for bookmark $id');
     }
   }
-
   // ブックマークの詳細コンテンツを取得
   static Future<String?> getBookmarkContent(String id) async {
     final db = await database;
+    print('🔍 Getting bookmark content for: "$id"');
+    
     final List<Map<String, dynamic>> maps = await db.query(
       'bookmarks',
-      columns: ['content'],
+      columns: ['content', 'id', 'title'],
       where: 'id = ?',
       whereArgs: [id],
       limit: 1,
     );
 
     if (maps.isEmpty) {
-      print('No bookmark found with id: $id');
+      print('❌ getBookmarkContent($id): bookmark not found');
       return null;
     }
 
-    final content = maps.first['content'];
-    if (content == null || content.toString().isEmpty) {
-      print('Bookmark $id exists but has no content');
+    final bookmark = maps.first;
+    final content = bookmark['content'];
+    final savedId = bookmark['id'];
+    final title = bookmark['title'];
+    
+    print('📊 Bookmark found: "$title" (ID: "$savedId")');
+
+    if (content == null) {
+      print('❌ getBookmarkContent($id): content is NULL');
       return null;
     }
 
-    print(
-      'Retrieved content for bookmark $id: ${content.toString().length} characters',
-    );
-    return content;
+    final contentStr = content.toString();
+    if (contentStr.trim().isEmpty) {
+      print('❌ getBookmarkContent($id): content is empty string');
+      return null;
+    }
+
+    print('✅ getBookmarkContent($id): retrieved ${contentStr.length} characters');
+    return contentStr;
   }
-
   // ブックマークのコンテンツがキャッシュされているかチェック
   static Future<bool> hasBookmarkContent(String id) async {
     final db = await database;
+    print('🔍 Checking hasBookmarkContent for: "$id"');
+    
     final List<Map<String, dynamic>> maps = await db.query(
       'bookmarks',
-      columns: ['content'],
-      where: 'id = ? AND content IS NOT NULL AND content != ""',
+      columns: ['content', 'id', 'title'],
+      where: 'id = ?',
       whereArgs: [id],
       limit: 1,
     );
 
-    final hasContent = maps.isNotEmpty;
-    if (hasContent) {
-      final content = maps.first['content'];
-      final length = content?.toString().length ?? 0;
-      print('hasBookmarkContent($id): true, length=$length');
-    } else {
-      print('hasBookmarkContent($id): false');
+    if (maps.isEmpty) {
+      print('❌ hasBookmarkContent($id): bookmark not found');
+      return false;
     }
 
-    return hasContent;
+    final bookmark = maps.first;
+    final content = bookmark['content'];
+    final savedId = bookmark['id'];
+    final title = bookmark['title'];
+    
+    print('📊 Bookmark found: "$title" (ID: "$savedId")');
+    
+    if (content == null) {
+      print('❌ hasBookmarkContent($id): content is NULL');
+      return false;
+    }
+    
+    final contentStr = content.toString();
+    if (contentStr.trim().isEmpty) {
+      print('❌ hasBookmarkContent($id): content is empty string');
+      return false;
+    }
+
+    print('✅ hasBookmarkContent($id): true, length=${contentStr.length}');
+    return true;
   }
 
   // ブックマーク情報とコンテンツの両方があるかチェック
