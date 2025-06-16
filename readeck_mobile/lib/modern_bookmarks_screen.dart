@@ -65,14 +65,15 @@ class ModernBookmarksScreen extends HookConsumerWidget {
                 search: searchController.text.isNotEmpty
                     ? searchController.text
                     : null,
-              );              await DatabaseService.saveBookmarks(bookmarks);
+              );
+              await DatabaseService.saveBookmarks(bookmarks);
               print(
                 'Bookmarks loaded from API successfully: ${bookmarks.length} items',
               );
-              
+
               // バックグラウンドで記事コンテンツを事前ダウンロード（最初の5件）
               final apiService = offline.OfflineAwareApiService(
-                app_main.globalApiClient, 
+                app_main.globalApiClient,
                 ref,
               );
               final idsToPreload = bookmarks
@@ -80,12 +81,16 @@ class ModernBookmarksScreen extends HookConsumerWidget {
                   .where((b) => b.id != null)
                   .map((b) => b.id!)
                   .toList();
-              
+
               if (idsToPreload.isNotEmpty) {
-                print('Starting background prefetch for ${idsToPreload.length} articles');
-                apiService.prefetchMultipleBookmarkContents(idsToPreload).catchError((e) {
-                  print('Background prefetch failed: $e');
-                });
+                print(
+                  'Starting background prefetch for ${idsToPreload.length} articles',
+                );
+                apiService
+                    .prefetchMultipleBookmarkContents(idsToPreload)
+                    .catchError((e) {
+                      print('Background prefetch failed: $e');
+                    });
               }
             } catch (apiError) {
               print('API error, falling back to database: $apiError');
@@ -665,19 +670,22 @@ class ModernBookmarksScreen extends HookConsumerWidget {
         elevation: 3,
         shadowColor: Colors.black.withOpacity(0.1),
         child: InkWell(
-          borderRadius: BorderRadius.circular(16),          onTap: () async {
+          borderRadius: BorderRadius.circular(16),
+          onTap: () async {
             if (bookmark.id != null) {
               // ブックマーク情報をDBに保存して詳細画面で利用可能にする
               try {
                 await DatabaseService.saveBookmark(bookmark);
                 print('Bookmark ${bookmark.id} saved to DB before navigation');
-                
+
                 // 記事内容も事前ダウンロード（バックグラウンドで実行）
                 final apiService = offline.OfflineAwareApiService(
-                  app_main.globalApiClient, 
+                  app_main.globalApiClient,
                   ref,
                 );
-                apiService.prefetchBookmarkContent(bookmark.id!).catchError((e) {
+                apiService.prefetchBookmarkContent(bookmark.id!).catchError((
+                  e,
+                ) {
                   print('Failed to prefetch content for ${bookmark.id}: $e');
                 });
               } catch (e) {

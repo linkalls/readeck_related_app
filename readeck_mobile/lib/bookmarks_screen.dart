@@ -506,7 +506,7 @@ class ModernBookmarksScreen extends HookConsumerWidget {
                             SizedBox(
                               height: MediaQuery.of(context).size.height * 0.1,
                             ),
-                            Container(
+                            SizedBox(
                               height: MediaQuery.of(context).size.height * 0.7,
                               child: Center(
                                 child: Column(

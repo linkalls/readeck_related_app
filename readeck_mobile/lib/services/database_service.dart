@@ -169,10 +169,11 @@ class DatabaseService {
     if (maps.isEmpty) return null;
     return _mapToBookmarkSummary(maps.first);
   }
+
   // ブックマークの詳細コンテンツを保存
   static Future<void> saveBookmarkContent(String id, String content) async {
     final db = await database;
-    
+
     // まず該当ブックマークが存在するかチェック
     final existing = await db.query(
       'bookmarks',
@@ -181,25 +182,28 @@ class DatabaseService {
       whereArgs: [id],
       limit: 1,
     );
-    
+
     if (existing.isEmpty) {
       print('Cannot save content: bookmark $id not found in database');
       return;
     }
-    
+
     final result = await db.update(
       'bookmarks',
       {'content': content},
       where: 'id = ?',
       whereArgs: [id],
     );
-    
+
     if (result > 0) {
-      print('Successfully saved content for bookmark $id: ${content.length} characters');
+      print(
+        'Successfully saved content for bookmark $id: ${content.length} characters',
+      );
     } else {
       print('Failed to update content for bookmark $id');
     }
   }
+
   // ブックマークの詳細コンテンツを取得
   static Future<String?> getBookmarkContent(String id) async {
     final db = await database;
@@ -215,16 +219,19 @@ class DatabaseService {
       print('No bookmark found with id: $id');
       return null;
     }
-    
+
     final content = maps.first['content'];
     if (content == null || content.toString().isEmpty) {
       print('Bookmark $id exists but has no content');
       return null;
     }
-    
-    print('Retrieved content for bookmark $id: ${content.toString().length} characters');
+
+    print(
+      'Retrieved content for bookmark $id: ${content.toString().length} characters',
+    );
     return content;
   }
+
   // ブックマークのコンテンツがキャッシュされているかチェック
   static Future<bool> hasBookmarkContent(String id) async {
     final db = await database;
@@ -235,7 +242,7 @@ class DatabaseService {
       whereArgs: [id],
       limit: 1,
     );
-    
+
     final hasContent = maps.isNotEmpty;
     if (hasContent) {
       final content = maps.first['content'];
@@ -244,7 +251,7 @@ class DatabaseService {
     } else {
       print('hasBookmarkContent($id): false');
     }
-    
+
     return hasContent;
   }
 
@@ -350,16 +357,18 @@ class DatabaseService {
       whereArgs: [id],
       limit: 1,
     );
-    
+
     if (maps.isEmpty) {
       print('DEBUG: Bookmark $id not found in database');
       return null;
     }
-    
+
     final bookmark = maps.first;
     final contentLength = bookmark['content']?.toString().length ?? 0;
-    final hasContent = bookmark['content'] != null && bookmark['content'].toString().trim().isNotEmpty;
-    
+    final hasContent =
+        bookmark['content'] != null &&
+        bookmark['content'].toString().trim().isNotEmpty;
+
     final debugInfo = {
       'id': bookmark['id'],
       'title': bookmark['title'],
@@ -369,7 +378,7 @@ class DatabaseService {
       'created_at': bookmark['created_at'],
       'sync_status': bookmark['sync_status'],
     };
-    
+
     print('DEBUG: Bookmark $id info: $debugInfo');
     return debugInfo;
   }
@@ -378,12 +387,16 @@ class DatabaseService {
   static Future<void> printAllBookmarksDebug() async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query('bookmarks');
-    
+
     print('=== DATABASE DEBUG: ${maps.length} bookmarks ===');
     for (final bookmark in maps) {
       final contentLength = bookmark['content']?.toString().length ?? 0;
-      final hasContent = bookmark['content'] != null && bookmark['content'].toString().trim().isNotEmpty;
-      print('${bookmark['id']}: "${bookmark['title']}" content=${hasContent ? '✓' : '✗'}($contentLength chars)');
+      final hasContent =
+          bookmark['content'] != null &&
+          bookmark['content'].toString().trim().isNotEmpty;
+      print(
+        '${bookmark['id']}: "${bookmark['title']}" content=${hasContent ? '✓' : '✗'}($contentLength chars)',
+      );
     }
     print('=== END DATABASE DEBUG ===');
   }

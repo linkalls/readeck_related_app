@@ -389,7 +389,7 @@ class HomeScreen extends HookConsumerWidget {
     final theme = Theme.of(context);
 
     // リフレッシュ関数
-    Future<void> _refreshBookmarks() async {
+    Future<void> refreshBookmarks() async {
       try {
         ref.invalidate(bookmarksProvider);
         await ref.read(bookmarksProvider.future);
@@ -516,7 +516,7 @@ class HomeScreen extends HookConsumerWidget {
               const SizedBox(height: 24),
               Expanded(
                 child: RefreshIndicator(
-                  onRefresh: _refreshBookmarks,
+                  onRefresh: refreshBookmarks,
                   color: theme.colorScheme.primary,
                   backgroundColor: theme.colorScheme.surface,
                   strokeWidth: 2.0,

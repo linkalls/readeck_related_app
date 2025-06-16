@@ -280,7 +280,7 @@ class OfflineAwareApiService {
         failed++;
         print('Prefetch failed for bookmark $id: $e');
       }
-      
+
       // レート制限を避けるために少し待機
       await Future.delayed(const Duration(milliseconds: 100));
     }
