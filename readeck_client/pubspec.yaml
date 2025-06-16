@@ -1,0 +1,22 @@
+name: readeck_client
+description: 
+version: 1.0.0
+# repository: https://github.com/my_org/my_repo
+
+environment:
+  sdk: ^3.8.1
+
+# Add regular dependencies here.
+dependencies:
+  freezed_annotation: ^3.0.0
+  http: ^1.4.0
+  json_annotation: ^4.9.0
+  # path: ^1.8.0
+
+dev_dependencies:
+  build_runner: ^2.4.15
+  freezed: ^3.0.6
+  json_serializable: ^6.9.5
+  lints: ^5.0.0
+  mocktail: ^1.0.4
+  test: ^1.26.2
