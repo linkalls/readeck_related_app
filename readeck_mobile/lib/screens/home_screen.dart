@@ -13,6 +13,52 @@ class HomeScreen extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final bookmarksAsync = ref.watch(bookmarksProvider);
     final theme = Theme.of(context);
+    
+    // 共有状態を監視してSnackBarを表示
+    ref.listen<SharingState>(sharingServiceProvider, (previous, next) {
+      if (next.error != null && previous?.error != next.error) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.error_outline, color: Colors.white),
+                const SizedBox(width: 8),
+                Expanded(child: Text('Failed to save bookmark: ${next.error}')),
+              ],
+            ),
+            backgroundColor: Colors.red,
+            action: SnackBarAction(
+              label: 'Dismiss',
+              textColor: Colors.white,
+              onPressed: () => ref.read(sharingServiceProvider.notifier).clearError(),
+            ),
+          ),
+        );
+      }
+      
+      // 処理が完了した場合（成功の場合）
+      if (previous?.isProcessing == true && 
+          next.isProcessing == false && 
+          next.error == null &&
+          (next.sharedText != null || next.sharedFiles.isNotEmpty)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Row(
+              children: [
+                Icon(Icons.bookmark_added, color: Colors.white),
+                SizedBox(width: 8),
+                Expanded(child: Text('Bookmark saved successfully!')),
+              ],
+            ),
+            backgroundColor: Colors.green,
+            duration: const Duration(seconds: 2),
+          ),
+        );
+        
+        // ブックマークリストを更新
+        ref.invalidate(bookmarksProvider);
+      }
+    });
 
     // リフレッシュ関数
     Future<void> refreshBookmarks() async {

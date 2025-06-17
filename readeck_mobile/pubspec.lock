@@ -407,6 +407,15 @@ packages:
       relative: true
     source: path
     version: "1.0.0"
+  receive_sharing_intent:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: "2cea396843cd3ab1b5ec4334be4233864637874e"
+      url: "https://github.com/KasemJaffer/receive_sharing_intent.git"
+    source: git
+    version: "1.8.1"
   riverpod:
     dependency: transitive
     description:

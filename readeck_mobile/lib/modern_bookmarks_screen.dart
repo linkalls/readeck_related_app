@@ -16,10 +16,10 @@ class ModernBookmarksScreen extends HookConsumerWidget {
     // プロバイダーから検索状態を取得
     final bookmarkListState = ref.watch(bookmarkListProvider);
     final bookmarkListNotifier = ref.read(bookmarkListProvider.notifier);
-    
+
     // 検索コントローラーを初期化し、プロバイダーの状態と同期
     final searchController = useTextEditingController();
-    
+
     // プロバイダーの検索クエリが変更されたら、コントローラーを更新
     useEffect(() {
       if (searchController.text != bookmarkListState.query) {
@@ -31,7 +31,8 @@ class ModernBookmarksScreen extends HookConsumerWidget {
     // 画面の初期化時にブックマークを読み込み
     useEffect(() {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (bookmarkListState.bookmarks.isEmpty && !bookmarkListState.isLoading) {
+        if (bookmarkListState.bookmarks.isEmpty &&
+            !bookmarkListState.isLoading) {
           bookmarkListNotifier.loadBookmarks(reset: true);
         }
       });
@@ -59,7 +60,9 @@ class ModernBookmarksScreen extends HookConsumerWidget {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.3),
+              Theme.of(
+                context,
+              ).colorScheme.primaryContainer.withValues(alpha: 0.3),
               Theme.of(context).colorScheme.surface,
             ],
           ),
@@ -86,21 +89,22 @@ class ModernBookmarksScreen extends HookConsumerWidget {
                     Expanded(
                       child: Text(
                         'Bookmarks',
-                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: Theme.of(context).textTheme.headlineSmall
+                            ?.copyWith(fontWeight: FontWeight.bold),
                       ),
                     ),
                     Text(
                       '${bookmarkListState.bookmarks.length} items',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withValues(alpha: 0.7),
                       ),
                     ),
                   ],
                 ),
               ),
-              
+
               // 検索バー
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -125,21 +129,25 @@ class ModernBookmarksScreen extends HookConsumerWidget {
                   onSubmitted: (_) => performSearch(),
                 ),
               ),
-              
+
               const SizedBox(height: 16),
-              
+
               // ブックマークリスト
               Expanded(
                 child: RefreshIndicator(
                   onRefresh: onRefresh,
-                  child: _buildBookmarksList(context, bookmarkListState, bookmarkListNotifier),
+                  child: _buildBookmarksList(
+                    context,
+                    bookmarkListState,
+                    bookmarkListNotifier,
+                  ),
                 ),
               ),
             ],
           ),
         ),
       ),
-      
+
       // フローティングアクションボタン
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddBookmarkDialog(context, ref),
@@ -154,9 +162,7 @@ class ModernBookmarksScreen extends HookConsumerWidget {
     BookmarkListNotifier notifier,
   ) {
     if (state.isLoading && state.bookmarks.isEmpty) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
+      return const Center(child: CircularProgressIndicator());
     }
 
     if (state.bookmarks.isEmpty) {
@@ -167,15 +173,19 @@ class ModernBookmarksScreen extends HookConsumerWidget {
             Icon(
               Icons.bookmark_border_rounded,
               size: 64,
-              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withValues(alpha: 0.5),
             ),
             const SizedBox(height: 16),
             Text(
-              state.query.isNotEmpty 
+              state.query.isNotEmpty
                   ? 'No bookmarks found for "${state.query}"'
                   : 'No bookmarks yet',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.7),
               ),
             ),
             const SizedBox(height: 8),
@@ -184,7 +194,9 @@ class ModernBookmarksScreen extends HookConsumerWidget {
                   ? 'Try a different search term'
                   : 'Add your first bookmark',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.5),
               ),
             ),
           ],
@@ -239,35 +251,45 @@ class ModernBookmarksScreen extends HookConsumerWidget {
                     Text(
                       bookmark.siteName!,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withValues(alpha: 0.7),
                       ),
                     ),
                   ],
-                  if (bookmark.description != null && bookmark.description!.isNotEmpty) ...[
+                  if (bookmark.description != null &&
+                      bookmark.description!.isNotEmpty) ...[
                     const SizedBox(height: 8),
                     Text(
                       bookmark.description!,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withValues(alpha: 0.8),
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ],
-                  if (bookmark.labels != null && bookmark.labels!.isNotEmpty) ...[
+                  if (bookmark.labels != null &&
+                      bookmark.labels!.isNotEmpty) ...[
                     const SizedBox(height: 8),
                     Wrap(
                       spacing: 6,
                       runSpacing: 4,
-                      children: bookmark.labels!.take(3).map((label) => 
-                        Chip(
-                          label: Text(
-                            label,
-                            style: Theme.of(context).textTheme.labelSmall,
-                          ),
-                          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        ),
-                      ).toList(),
+                      children: bookmark.labels!
+                          .take(3)
+                          .map(
+                            (label) => Chip(
+                              label: Text(
+                                label,
+                                style: Theme.of(context).textTheme.labelSmall,
+                              ),
+                              materialTapTargetSize:
+                                  MaterialTapTargetSize.shrinkWrap,
+                            ),
+                          )
+                          .toList(),
                     ),
                   ],
                 ],
@@ -318,22 +340,29 @@ class ModernBookmarksScreen extends HookConsumerWidget {
           FilledButton(
             onPressed: () async {
               if (urlController.text.isNotEmpty) {
-                try {                  final api = await getApiClient();
+                try {
+                  final api = await getApiClient();
                   await api.createBookmark(
                     BookmarkCreate(
                       url: urlController.text,
-                      title: titleController.text.isNotEmpty ? titleController.text : null,
+                      title: titleController.text.isNotEmpty
+                          ? titleController.text
+                          : null,
                     ),
                   );
-                  
+
                   if (context.mounted) {
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Bookmark added successfully')),
+                      const SnackBar(
+                        content: Text('Bookmark added successfully'),
+                      ),
                     );
-                    
+
                     // リストを更新
-                    ref.read(bookmarkListProvider.notifier).loadBookmarks(reset: true);
+                    ref
+                        .read(bookmarkListProvider.notifier)
+                        .loadBookmarks(reset: true);
                   }
                 } catch (e) {
                   if (context.mounted) {

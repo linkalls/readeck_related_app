@@ -38,11 +38,13 @@ dependencies:
   go_router: ^15.2.0
   readeck_client:
    path: ../readeck_client
-  hooks_riverpod: ^2.6.1  
+  hooks_riverpod: ^2.6.1    
   markdown_widget: ^2.3.2+8
   share_plus: ^10.1.1
   url_launcher: ^6.3.1
-  # receive_sharing_intent: ^1.8.0
+  receive_sharing_intent:
+    git:
+      url: https://github.com/KasemJaffer/receive_sharing_intent.git
   sqflite: ^2.3.0
   path: ^1.8.3
   connectivity_plus: ^6.1.4

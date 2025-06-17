@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+
 import 'config/router.dart';
 import 'providers/providers.dart';
-import 'services/database_service.dart';
 import 'screens/screens.dart';
+import 'services/database_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,6 +27,9 @@ class ReadeckApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final token = ref.watch(authTokenProvider);
     final autoLoginAsync = ref.watch(autoLoginProvider);
+
+    // 共有サービスを監視して初期化
+    ref.watch(sharingServiceProvider);
 
     return MaterialApp.router(
       title: 'Readeck Mobile',
@@ -69,9 +73,8 @@ class ReadeckApp extends ConsumerWidget {
             }
             return child ?? const SizedBox.shrink();
           },
-          loading: () => const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          ),
+          loading: () =>
+              const Scaffold(body: Center(child: CircularProgressIndicator())),
           error: (error, _) => const LoginScreen(),
         );
       },
