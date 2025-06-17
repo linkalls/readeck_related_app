@@ -116,13 +116,8 @@ class SharingService extends StateNotifier<SharingState> {
       final primaryUrl = urls.first;
       print('🔗 Extracted URL: $primaryUrl');
 
-      // 追加情報として残りのテキストも保存
-      final remainingText = text.replaceAll(primaryUrl, '').trim();
-
-      await _createBookmarkFromUrl(
-        primaryUrl,
-        description: remainingText.isNotEmpty ? remainingText : null,
-      );
+      // URLのみを送信し、タイトル処理はバックエンドに任せる
+      await _createBookmarkFromUrl(primaryUrl);
     } else {
       // URLが含まれていない場合はテキスト自体を保存またはエラー
       print('⚠️ No URL found in shared text');
@@ -161,17 +156,16 @@ class SharingService extends StateNotifier<SharingState> {
   }
 
   // URLからブックマークを作成（Pocketライクな動作）
-  Future<void> _createBookmarkFromUrl(String url, {String? description}) async {
+  Future<void> _createBookmarkFromUrl(String url) async {
     try {
       state = state.copyWith(isProcessing: true, error: null);
 
       final api = await getApiClient();
 
-      // BookmarkCreateオブジェクトを使って適切にブックマークを作成
+      // URLのみを送信し、タイトルやメタデータの処理はバックエンドに任せる
       final bookmark = await api.createBookmark(
         BookmarkCreate(
           url: url.trim(),
-          title: description, // 説明をタイトルとして使用
           labels: ['shared'], // 共有で追加されたことを示すラベル
         ),
       );
