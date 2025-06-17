@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+
 import '../bookmark_detail_screen.dart';
 import '../modern_bookmarks_screen.dart';
 import '../screens/screens.dart';
@@ -9,19 +10,26 @@ final router = GoRouter(
   debugLogDiagnostics: true,
   redirect: (context, state) {
     // 無効なパスの場合はホームにリダイレクト
-    final validPaths = ['/', '/bookmarks', '/labels', '/collections', '/settings', '/login'];
+    final validPaths = [
+      '/',
+      '/bookmarks',
+      '/labels',
+      '/collections',
+      '/settings',
+      '/login',
+    ];
     final path = state.fullPath ?? state.path ?? '/';
-    
+
     if (path.startsWith('/bookmark/')) {
       // ブックマーク詳細のパスは有効
       return null;
     }
-    
+
     if (!validPaths.contains(path) && !path.startsWith('/bookmark/')) {
       print('Invalid path detected: $path, redirecting to home');
       return '/';
     }
-    
+
     return null; // リダイレクトしない
   },
   errorBuilder: (context, state) {
@@ -29,7 +37,7 @@ final router = GoRouter(
     print('URI: ${state.uri}');
     print('Path: ${state.path}');
     print('Full path: ${state.fullPath}');
-    
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('ナビゲーションエラー'),

@@ -78,7 +78,7 @@ class BookmarkDetailScreen extends HookConsumerWidget {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
+                theme.colorScheme.primaryContainer.withOpacity(0.3),
                 theme.colorScheme.surface,
               ],
             ),
@@ -114,9 +114,8 @@ class BookmarkDetailScreen extends HookConsumerWidget {
                               Text(
                                 bookmark.siteName!,
                                 style: theme.textTheme.bodySmall?.copyWith(
-                                  color: theme.colorScheme.onSurface.withValues(
-                                    alpha: 0.7,
-                                  ),
+                                  color: theme.colorScheme.onSurface
+                                      .withOpacity(0.7),
                                 ),
                               ),
                           ],
@@ -161,7 +160,7 @@ class BookmarkDetailScreen extends HookConsumerWidget {
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: MarkdownWidget(
                         data: markdown,
-                        config: _buildMarkdownConfig(context),
+                        config: MarkdownConfig(),
                       ),
                     ),
                     loading: () =>
@@ -205,7 +204,7 @@ class BookmarkDetailScreen extends HookConsumerWidget {
                                       : e.toString(),
                                   style: theme.textTheme.bodyMedium?.copyWith(
                                     color: theme.colorScheme.onSurface
-                                        .withValues(alpha: 0.7),
+                                        .withOpacity(0.7),
                                   ),
                                   textAlign: TextAlign.center,
                                 ),
@@ -248,7 +247,7 @@ class BookmarkDetailScreen extends HookConsumerWidget {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
+                    theme.colorScheme.primaryContainer.withOpacity(0.3),
                     theme.colorScheme.surface,
                   ],
                 ),
@@ -316,9 +315,8 @@ class BookmarkDetailScreen extends HookConsumerWidget {
                                     ? 'このブックマークはまだローカルに保存されていません。オンラインになったときに再度お試しください。'
                                     : e.toString(),
                                 style: theme.textTheme.bodyMedium?.copyWith(
-                                  color: theme.colorScheme.onSurface.withValues(
-                                    alpha: 0.7,
-                                  ),
+                                  color: theme.colorScheme.onSurface
+                                      .withOpacity(0.7),
                                 ),
                                 textAlign: TextAlign.center,
                               ),
@@ -397,7 +395,7 @@ class BookmarkDetailScreen extends HookConsumerWidget {
                   Text(
                     'キャッシュデータを表示中',
                     style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.9),
+                      color: Colors.white.withOpacity(0.9),
                       fontSize: 12,
                     ),
                   ),
@@ -434,106 +432,5 @@ class BookmarkDetailScreen extends HookConsumerWidget {
         }
         break;
     }
-  }
-
-  // ダークモード対応のMarkdownConfig構築
-  MarkdownConfig _buildMarkdownConfig(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final theme = Theme.of(context);
-
-    return MarkdownConfig(
-      configs: [
-        // Pre（コードブロック）の設定
-        PreConfig(
-          textStyle: TextStyle(
-            fontSize: 14,
-            fontFamily: 'monospace',
-            color: isDark ? Colors.green[300] : Colors.green[800],
-          ),
-          decoration: BoxDecoration(
-            color: isDark ? Colors.grey[900] : Colors.grey[100],
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: isDark ? Colors.grey[700]! : Colors.grey[300]!,
-            ),
-          ),
-          padding: const EdgeInsets.all(12),
-          margin: const EdgeInsets.symmetric(vertical: 8),
-        ),
-        // 段落の設定
-        PConfig(
-          textStyle: TextStyle(
-            fontSize: 16,
-            height: 1.8,
-            color: theme.textTheme.bodyLarge?.color,
-          ),
-        ),
-        // 見出しの設定
-        H1Config(
-          style: TextStyle(
-            fontSize: 28,
-            fontWeight: FontWeight.bold,
-            color: theme.colorScheme.onSurface,
-            height: 1.2,
-          ),
-        ),
-        H2Config(
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: theme.colorScheme.onSurface,
-            height: 1.3,
-          ),
-        ),
-        H3Config(
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-            color: theme.colorScheme.onSurface,
-            height: 1.4,
-          ),
-        ),
-        H4Config(
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: theme.colorScheme.onSurface,
-            height: 1.4,
-          ),
-        ),
-        // リンクの設定
-        LinkConfig(
-          style: TextStyle(
-            color: theme.colorScheme.primary,
-            decoration: TextDecoration.underline,
-          ),
-        ),
-        // コードスパンの設定
-        CodeConfig(
-          style: TextStyle(
-            fontSize: 14,
-            fontFamily: 'monospace',
-            color: isDark ? Colors.orange[300] : Colors.orange[800],
-            backgroundColor: isDark ? Colors.grey[800] : Colors.grey[200],
-          ),
-        ), // 引用ブロックの設定
-        BlockquoteConfig(
-          padding: const EdgeInsets.all(12),
-          margin: const EdgeInsets.symmetric(vertical: 8),
-        ),
-        // テーブルの設定
-        TableConfig(
-          columnWidths: const <int, TableColumnWidth>{
-            0: FlexColumnWidth(1.0),
-            1: FlexColumnWidth(2.0),
-          },
-          defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-          border: TableBorder.all(
-            color: isDark ? Colors.grey[700]! : Colors.grey[300]!,
-            width: 1,
-          ),
-        ),
-      ],
-    );
   }
 }

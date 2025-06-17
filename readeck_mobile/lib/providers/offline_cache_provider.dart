@@ -1,11 +1,12 @@
 import 'dart:convert';
+
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:readeck_client/readeck_client.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class OfflineCacheNotifier extends StateNotifier<Map<String, dynamic>> {
   OfflineCacheNotifier() : super({});
-  
+
   Future<void> cacheBookmarks(List<BookmarkSummary> bookmarks) async {
     final prefs = await SharedPreferences.getInstance();
     final bookmarksJson = bookmarks

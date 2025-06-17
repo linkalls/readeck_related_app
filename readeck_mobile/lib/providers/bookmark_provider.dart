@@ -1,7 +1,8 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:readeck_client/readeck_client.dart';
-import 'offline_cache_provider.dart';
+
 import '../utils/api_client.dart';
+import 'offline_cache_provider.dart';
 
 // ブックマーク一覧の状態管理
 class BookmarkListState {
@@ -64,7 +65,8 @@ class BookmarkListNotifier extends StateNotifier<BookmarkListState> {
 
       final allBookmarks = reset
           ? newBookmarks
-          : [...state.bookmarks, ...newBookmarks];      state = state.copyWith(
+          : [...state.bookmarks, ...newBookmarks];
+      state = state.copyWith(
         bookmarks: allBookmarks,
         offset: state.offset + newBookmarks.length,
         hasMore: newBookmarks.length == pageSize,
