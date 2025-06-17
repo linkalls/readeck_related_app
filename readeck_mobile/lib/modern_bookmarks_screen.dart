@@ -7,7 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:readeck_client/readeck_client.dart';
 
-import 'main.dart' as app_main;
+import 'utils/api_client.dart';
 import 'services/database_service.dart';
 import 'services/offline_service.dart' as offline;
 
@@ -59,7 +59,7 @@ class ModernBookmarksScreen extends HookConsumerWidget {
           if (isOnlineNow) {
             try {
               print('Loading bookmarks from API');
-              final api = await app_main.getApiClient();
+              final api = await getApiClient();
               bookmarks = await api.listBookmarks(
                 limit: 50,
                 search: searchController.text.isNotEmpty
@@ -73,7 +73,7 @@ class ModernBookmarksScreen extends HookConsumerWidget {
 
               // バックグラウンドで記事コンテンツを事前ダウンロード（最初の5件）
               final apiService = offline.OfflineAwareApiService(
-                app_main.globalApiClient,
+                globalApiClient,
                 ref,
               );
               final idsToPreload = bookmarks
@@ -207,7 +207,7 @@ class ModernBookmarksScreen extends HookConsumerWidget {
         data: (result) {
           if (result != ConnectivityResult.none) {
             final apiService = offline.OfflineAwareApiService(
-              app_main.globalApiClient,
+              globalApiClient,
               ref,
             );
             apiService.autoSync();
@@ -252,7 +252,7 @@ class ModernBookmarksScreen extends HookConsumerWidget {
                   Container(
                     padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
+                      color: Colors.white.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(
@@ -279,7 +279,7 @@ class ModernBookmarksScreen extends HookConsumerWidget {
                         Text(
                           'キャッシュデータを表示中',
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.9),
+                            color: Colors.white.withValues(alpha: 0.9),
                             fontSize: 12,
                           ),
                         ),
@@ -289,7 +289,7 @@ class ModernBookmarksScreen extends HookConsumerWidget {
                   if (isOfflineMode) ...[
                     Container(
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
+                        color: Colors.white.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: TextButton(
@@ -335,7 +335,7 @@ class ModernBookmarksScreen extends HookConsumerWidget {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3),
+              Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.3),
               Theme.of(context).colorScheme.surface,
             ],
           ),
@@ -368,7 +368,7 @@ class ModernBookmarksScreen extends HookConsumerWidget {
                                 ?.copyWith(
                                   color: Theme.of(
                                     context,
-                                  ).colorScheme.onSurface.withOpacity(0.7),
+                                  ).colorScheme.onSurface.withValues(alpha: 0.7),
                                 ),
                           ),
                         ],
@@ -407,7 +407,7 @@ class ModernBookmarksScreen extends HookConsumerWidget {
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
+                        color: Colors.black.withValues(alpha: 0.1),
                         blurRadius: 8,
                         offset: const Offset(0, 2),
                       ),
@@ -668,7 +668,7 @@ class ModernBookmarksScreen extends HookConsumerWidget {
       child: Material(
         borderRadius: BorderRadius.circular(16),
         elevation: 3,
-        shadowColor: Colors.black.withOpacity(0.1),
+        shadowColor: Colors.black.withValues(alpha: 0.1),
         child: InkWell(
           borderRadius: BorderRadius.circular(16),
           onTap: () async {
@@ -680,7 +680,7 @@ class ModernBookmarksScreen extends HookConsumerWidget {
 
                 // 記事内容も事前ダウンロード（バックグラウンドで実行）
                 final apiService = offline.OfflineAwareApiService(
-                  app_main.globalApiClient,
+                  globalApiClient,
                   ref,
                 );
                 apiService.prefetchBookmarkContent(bookmark.id!).catchError((
@@ -706,7 +706,7 @@ class ModernBookmarksScreen extends HookConsumerWidget {
                 end: Alignment.bottomRight,
                 colors: [
                   Theme.of(context).colorScheme.surface,
-                  Theme.of(context).colorScheme.surface.withOpacity(0.8),
+                  Theme.of(context).colorScheme.surface.withValues(alpha: 0.8),
                 ],
               ),
             ),
@@ -720,10 +720,10 @@ class ModernBookmarksScreen extends HookConsumerWidget {
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         color: bookmark.isMarked == true
-                            ? Colors.amber.withOpacity(0.2)
+                            ? Colors.amber.withValues(alpha: 0.2)
                             : Theme.of(
                                 context,
-                              ).colorScheme.primaryContainer.withOpacity(0.5),
+                              ).colorScheme.primaryContainer.withValues(alpha: 0.5),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Icon(
@@ -751,7 +751,7 @@ class ModernBookmarksScreen extends HookConsumerWidget {
                         Icons.more_vert_rounded,
                         color: Theme.of(
                           context,
-                        ).colorScheme.onSurface.withOpacity(0.6),
+                        ).colorScheme.onSurface.withValues(alpha: 0.6),
                       ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -809,7 +809,7 @@ class ModernBookmarksScreen extends HookConsumerWidget {
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: Theme.of(
                           context,
-                        ).colorScheme.onSurface.withOpacity(0.8),
+                        ).colorScheme.onSurface.withValues(alpha: 0.8),
                         height: 1.4,
                       ),
                       maxLines: 2,
@@ -825,7 +825,7 @@ class ModernBookmarksScreen extends HookConsumerWidget {
                   decoration: BoxDecoration(
                     color: Theme.of(
                       context,
-                    ).colorScheme.primaryContainer.withOpacity(0.3),
+                    ).colorScheme.primaryContainer.withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
@@ -952,7 +952,7 @@ class ModernBookmarksScreen extends HookConsumerWidget {
               if (urlController.text.isNotEmpty) {
                 try {
                   final apiService = offline.OfflineAwareApiService(
-                    app_main.globalApiClient,
+                    globalApiClient,
                     ref,
                   );
                   await apiService.createBookmark(
@@ -1023,7 +1023,7 @@ class ModernBookmarksScreen extends HookConsumerWidget {
         if (confirmed == true && bookmark.id != null) {
           try {
             final apiService = offline.OfflineAwareApiService(
-              app_main.globalApiClient,
+              globalApiClient,
               ref,
             );
             await apiService.deleteBookmark(bookmark.id!);

@@ -1,13 +1,12 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:markdown_widget/markdown_widget.dart';
 import 'package:readeck_client/readeck_client.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'main.dart';
+import 'utils/api_client.dart';
 import 'services/offline_service.dart' as offline;
 
 // オフライン対応のブックマーク詳細情報（Markdown）を取得するProvider
@@ -79,7 +78,7 @@ class BookmarkDetailScreen extends HookConsumerWidget {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                theme.colorScheme.primaryContainer.withOpacity(0.3),
+                theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
                 theme.colorScheme.surface,
               ],
             ),
@@ -116,7 +115,7 @@ class BookmarkDetailScreen extends HookConsumerWidget {
                                 bookmark.siteName!,
                                 style: theme.textTheme.bodySmall?.copyWith(
                                   color: theme.colorScheme.onSurface
-                                      .withOpacity(0.7),
+                                      .withValues(alpha: 0.7),
                                 ),
                               ),
                           ],
@@ -205,7 +204,7 @@ class BookmarkDetailScreen extends HookConsumerWidget {
                                       : e.toString(),
                                   style: theme.textTheme.bodyMedium?.copyWith(
                                     color: theme.colorScheme.onSurface
-                                        .withOpacity(0.7),
+                                        .withValues(alpha: 0.7),
                                   ),
                                   textAlign: TextAlign.center,
                                 ),
@@ -248,7 +247,7 @@ class BookmarkDetailScreen extends HookConsumerWidget {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    theme.colorScheme.primaryContainer.withOpacity(0.3),
+                    theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
                     theme.colorScheme.surface,
                   ],
                 ),
@@ -317,7 +316,7 @@ class BookmarkDetailScreen extends HookConsumerWidget {
                                     : e.toString(),
                                 style: theme.textTheme.bodyMedium?.copyWith(
                                   color: theme.colorScheme.onSurface
-                                      .withOpacity(0.7),
+                                      .withValues(alpha: 0.7),
                                 ),
                                 textAlign: TextAlign.center,
                               ),
@@ -396,7 +395,7 @@ class BookmarkDetailScreen extends HookConsumerWidget {
                   Text(
                     'キャッシュデータを表示中',
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.9),
+                      color: Colors.white.withValues(alpha: 0.9),
                       fontSize: 12,
                     ),
                   ),
