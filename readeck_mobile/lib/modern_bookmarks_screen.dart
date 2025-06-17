@@ -203,11 +203,19 @@ class ModernBookmarksScreen extends HookConsumerWidget {
         ),
       );
     }
-
     return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       itemCount: state.bookmarks.length + (state.hasMore ? 1 : 0),
       itemBuilder: (context, index) {
+        // 最後の5アイテムで自動的に次のページを読み込み
+        if (index == state.bookmarks.length - 5 &&
+            state.hasMore &&
+            !state.isLoading) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            notifier.loadMore();
+          });
+        }
+
         if (index == state.bookmarks.length) {
           // ローディングインジケーター（もっと読み込む）
           if (state.isLoading) {
@@ -215,13 +223,27 @@ class ModernBookmarksScreen extends HookConsumerWidget {
               padding: EdgeInsets.all(16),
               child: Center(child: CircularProgressIndicator()),
             );
-          } else {
-            // もっと読み込むボタン
+          } else if (state.hasMore) {
+            // もっと読み込むボタン（手動）
             return Padding(
               padding: const EdgeInsets.all(16),
               child: ElevatedButton(
                 onPressed: () => notifier.loadMore(),
                 child: const Text('Load More'),
+              ),
+            );
+          } else {
+            // これ以上データがない場合
+            return Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text(
+                'No more bookmarks',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.5),
+                ),
               ),
             );
           }

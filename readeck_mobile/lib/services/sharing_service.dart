@@ -102,25 +102,66 @@ class SharingService extends StateNotifier<SharingState> {
 
   // 共有されたテキスト/URLを処理
   Future<void> _processSharedText(String text) async {
-    print('Processing shared text: $text');
+    if (text.trim().isEmpty) return;
 
-    // URLかどうかを判定
-    if (_isUrl(text)) {
-      await _createBookmarkFromUrl(text);
+    print(
+      '📎 Processing shared text: ${text.substring(0, text.length > 100 ? 100 : text.length)}...',
+    );
+
+    // テキストからURLを抽出（複数のURLが含まれている可能性もある）
+    final urls = _extractUrlsFromText(text);
+
+    if (urls.isNotEmpty) {
+      // 複数のURLがある場合は最初のURLを使用
+      final primaryUrl = urls.first;
+      print('🔗 Extracted URL: $primaryUrl');
+
+      // 追加情報として残りのテキストも保存
+      final remainingText = text.replaceAll(primaryUrl, '').trim();
+
+      await _createBookmarkFromUrl(
+        primaryUrl,
+        description: remainingText.isNotEmpty ? remainingText : null,
+      );
     } else {
-      // 通常のテキストとして処理
-      print('Shared text (not URL): $text');
+      // URLが含まれていない場合はテキスト自体を保存またはエラー
+      print('⚠️ No URL found in shared text');
+      state = state.copyWith(
+        error: 'No valid URL found in shared content',
+        isProcessing: false,
+      );
     }
   }
 
-  // URLかどうかを判定
-  bool _isUrl(String text) {
-    final urlPattern = RegExp(r'^https?:\/\/[^\s]+$', caseSensitive: false);
-    return urlPattern.hasMatch(text.trim());
+  // テキストからURLを抽出するヘルパー関数
+  List<String> _extractUrlsFromText(String text) {
+    final urlRegex = RegExp(
+      r'https?://[^\s]+|www\.[^\s]+',
+      caseSensitive: false,
+    );
+
+    final matches = urlRegex.allMatches(text);
+    final urls = <String>[];
+
+    for (final match in matches) {
+      String url = match.group(0)!;
+
+      // www.で始まる場合はhttps://を追加
+      if (url.startsWith('www.')) {
+        url = 'https://$url';
+      }
+
+      // 末尾の句読点を除去
+      url = url.replaceAll(RegExp(r'[.,!?;:]$'), '');
+
+      urls.add(url);
+    }
+
+    return urls;
   }
 
   // URLからブックマークを作成（Pocketライクな動作）
-  Future<void> _createBookmarkFromUrl(String url) async {
+  Future<void> _createBookmarkFromUrl(String url, {String? description}) async {
     try {
       state = state.copyWith(isProcessing: true, error: null);
 
@@ -130,6 +171,7 @@ class SharingService extends StateNotifier<SharingState> {
       final bookmark = await api.createBookmark(
         BookmarkCreate(
           url: url.trim(),
+          title: description, // 説明をタイトルとして使用
           labels: ['shared'], // 共有で追加されたことを示すラベル
         ),
       );
