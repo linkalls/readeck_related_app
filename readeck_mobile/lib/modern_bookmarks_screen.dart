@@ -6,6 +6,8 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:readeck_client/readeck_client.dart';
 
+
+import 'screens/paywall_webview_screen.dart';
 import 'providers/providers.dart';
 import 'utils/api_client.dart';
 
@@ -322,82 +324,161 @@ class ModernBookmarksScreen extends HookConsumerWidget {
       },
     );
   }
-
   void _showAddBookmarkDialog(BuildContext context, WidgetRef ref) {
     final urlController = TextEditingController();
     final titleController = TextEditingController();
+    bool useWebView = false;
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Add Bookmark'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: urlController,
-              decoration: const InputDecoration(
-                labelText: 'URL',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.link_rounded),
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          title: const Text('Add Bookmark'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: urlController,
+                decoration: const InputDecoration(
+                  labelText: 'URL',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.link_rounded),
+                ),
+                autofocus: true,
               ),
-              autofocus: true,
+              const SizedBox(height: 16),
+              TextField(
+                controller: titleController,
+                decoration: const InputDecoration(
+                  labelText: 'Title (optional)',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.title_rounded),
+                ),
+              ),
+              const SizedBox(height: 16),
+              // WebViewオプション
+              Container(
+                padding: const EdgeInsets.all(12),                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.web_rounded,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'WebView Options',
+                          style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    CheckboxListTile(
+                      value: useWebView,
+                      onChanged: (value) {
+                        setState(() {
+                          useWebView = value ?? false;
+                        });
+                      },
+                      title: Text(
+                        'Use WebView for paywalled content',
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                      subtitle: Text(
+                        'Opens page in WebView to bypass paywalls',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                        ),
+                      ),
+                      contentPadding: EdgeInsets.zero,
+                      dense: true,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
             ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: titleController,
-              decoration: const InputDecoration(
-                labelText: 'Title (optional)',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.title_rounded),
-              ),
+            FilledButton(
+              onPressed: () async {
+                if (urlController.text.isNotEmpty) {
+                  if (useWebView) {
+                    // WebViewを使用してブックマークを追加
+                    Navigator.pop(context);
+                    _showWebViewForBookmark(context, ref, urlController.text, titleController.text);
+                  } else {
+                    // 通常のブックマーク追加
+                    try {
+                      final api = await getApiClient();
+                      await api.createBookmark(
+                        BookmarkCreate(
+                          url: urlController.text,
+                          title: titleController.text.isNotEmpty
+                              ? titleController.text
+                              : null,
+                        ),
+                      );
+
+                      if (context.mounted) {
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Bookmark added successfully'),
+                          ),
+                        );
+
+                        // リストを更新
+                        ref
+                            .read(bookmarkListProvider.notifier)
+                            .loadBookmarks(reset: true);
+                      }
+                    } catch (e) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Failed to add bookmark: $e')),
+                        );
+                      }
+                    }
+                  }
+                }
+              },
+              child: Text(useWebView ? 'Open in WebView' : 'Add'),
             ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () async {
-              if (urlController.text.isNotEmpty) {
-                try {
-                  final api = await getApiClient();
-                  await api.createBookmark(
-                    BookmarkCreate(
-                      url: urlController.text,
-                      title: titleController.text.isNotEmpty
-                          ? titleController.text
-                          : null,
-                    ),
-                  );
+      ),
+    );
+  }
 
-                  if (context.mounted) {
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Bookmark added successfully'),
-                      ),
-                    );
-
-                    // リストを更新
-                    ref
-                        .read(bookmarkListProvider.notifier)
-                        .loadBookmarks(reset: true);
-                  }
-                } catch (e) {
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Failed to add bookmark: $e')),
-                    );
-                  }
-                }
-              }
-            },
-            child: const Text('Add'),
-          ),
-        ],
+  // WebViewでブックマーク追加
+  void _showWebViewForBookmark(BuildContext context, WidgetRef ref, String url, String? title) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PaywallWebViewScreen(
+          url: url,
+          title: title,
+          onBookmarkSaved: () {
+            // ブックマーク保存後の処理
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Bookmark saved via WebView')),
+            );
+            ref.read(bookmarkListProvider.notifier).loadBookmarks(reset: true);
+          },
+        ),
       ),
     );
   }

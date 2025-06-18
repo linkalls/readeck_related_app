@@ -898,6 +898,81 @@ class ReadeckApiClient {
   void dispose() {
     _httpClient.close();
   }
+
+  /// Creates a bookmark with full HTML content via multipart/form-data.
+  Future<BookmarkInfo> createBookmarkWithContent({
+    required String url,
+    String? title,
+    required String contentHtml,
+    List<String>? labels,
+    bool fromSelection = false,
+  }) async {
+    final uri = Uri.parse('$baseUrl/api/bookmarks');
+    final request = http.MultipartRequest('POST', uri);
+
+    // Add common headers
+    request.headers.addAll(_getHeaders(contentType: null));
+    // Basic fields
+    request.fields['url'] = url;
+    if (title != null) request.fields['title'] = title;
+    if (fromSelection)
+      request.fields['feature_find_main'] =
+          'false'; // Labels (add each label separately as recommended by ctxt.io)
+    if (labels != null) {
+      for (final label in labels) {
+        request.fields.addAll({'labels': label});
+      }
+    } // Resource (HTML content with metadata)
+    final resourceMetadata = jsonEncode({
+      'url': url,
+      'headers': {'content-type': 'text/html; charset=utf-8'},
+    });
+    final resourceContent = '$resourceMetadata\n$contentHtml';
+
+    request.files.add(
+      http.MultipartFile.fromString(
+        'resource',
+        resourceContent,
+        filename: 'content.html',
+        contentType: MediaType('application', 'octet-stream'),
+      ),
+    );
+    final streamed = await _httpClient.send(request);
+    final response = await http.Response.fromStream(streamed);
+
+    // デバッグログ
+    print('🚀 Bookmark with content request:');
+    print('  URL: $url');
+    print('  Title: $title');
+    print('  Content length: ${contentHtml.length} chars');
+    print('  Labels: $labels');
+    print('  Response status: ${response.statusCode}');
+    print('  Response body: ${response.body}');
+
+    if (response.statusCode == 202) {
+      // 202 Accepted - リンクが送信された（バックグラウンド処理）
+      print('✅ Content submitted for background processing');
+      return BookmarkInfo(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        title: title ?? 'Submitted for processing',
+        url: url,
+        isMarked: false,
+        isArchived: false,
+        created: DateTime.now(),
+        updated: DateTime.now(),
+      );
+    }
+
+    final body = _decodeResponse(response, expectJson: true);
+    if (body is Map<String, dynamic>) {
+      return BookmarkInfo.fromJson(body);
+    }
+    throw ApiException(
+      'Unexpected response creating bookmark with content: ${response.statusCode}',
+      statusCode: response.statusCode,
+      responseBody: body,
+    );
+  }
 }
 
 /// Helper class to encapsulate an [ApiMessage] and an optional [location] URL,
