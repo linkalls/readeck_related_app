@@ -3,6 +3,9 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:readeck_client/readeck_client.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'label_bookmarks_screen.dart';
+// import 'bookmarks_screen.dart';
+
 ReadeckApiClient? globalApiClient;
 Future<ReadeckApiClient> getApiClient() async {
   if (globalApiClient != null) return globalApiClient!;
@@ -52,6 +55,16 @@ class LabelsScreen extends HookWidget {
                       'Count: ${l.count ?? 0}',
                       style: TextStyle(color: isDark ? Colors.white70 : null),
                     ),
+                    leading: const Icon(Icons.label_rounded),
+                    onTap: () {
+                      // ラベルをタップしたら、そのラベルでブックマークを絞り込み表示
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              LabelBookmarksScreen(label: l.name ?? ''),
+                        ),
+                      );
+                    },
                   );
                 },
               ),

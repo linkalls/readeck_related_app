@@ -4,7 +4,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../providers/providers.dart';
 import '../widgets/widgets.dart';
-import 'advanced_search_screen.dart';
 
 class HomeScreen extends HookConsumerWidget {
   const HomeScreen({super.key});
@@ -13,7 +12,7 @@ class HomeScreen extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final bookmarksAsync = ref.watch(bookmarksProvider);
     final theme = Theme.of(context);
-    
+
     // 共有状態を監視してSnackBarを表示
     ref.listen<SharingState>(sharingServiceProvider, (previous, next) {
       if (next.error != null && previous?.error != next.error) {
@@ -30,15 +29,16 @@ class HomeScreen extends HookConsumerWidget {
             action: SnackBarAction(
               label: 'Dismiss',
               textColor: Colors.white,
-              onPressed: () => ref.read(sharingServiceProvider.notifier).clearError(),
+              onPressed: () =>
+                  ref.read(sharingServiceProvider.notifier).clearError(),
             ),
           ),
         );
       }
-      
+
       // 処理が完了した場合（成功の場合）
-      if (previous?.isProcessing == true && 
-          next.isProcessing == false && 
+      if (previous?.isProcessing == true &&
+          next.isProcessing == false &&
           next.error == null &&
           (next.sharedText != null || next.sharedFiles.isNotEmpty)) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -54,7 +54,7 @@ class HomeScreen extends HookConsumerWidget {
             duration: const Duration(seconds: 2),
           ),
         );
-        
+
         // ブックマークリストを更新
         ref.invalidate(bookmarksProvider);
       }
@@ -131,7 +131,7 @@ class HomeScreen extends HookConsumerWidget {
                       ),
                     ),
                     IconButton.filled(
-                      onPressed: () => context.go('/settings'),
+                      onPressed: () => context.push('/settings'),
                       icon: const Icon(Icons.settings_rounded),
                     ),
                   ],
@@ -171,7 +171,7 @@ class HomeScreen extends HookConsumerWidget {
                       child: NavCard(
                         icon: Icons.label_rounded,
                         title: 'Labels',
-                        onTap: () => context.go('/labels'),
+                        onTap: () => context.push('/labels'),
                       ),
                     ),
                     const SizedBox(width: 16),
@@ -179,7 +179,7 @@ class HomeScreen extends HookConsumerWidget {
                       child: NavCard(
                         icon: Icons.collections_bookmark_rounded,
                         title: 'Collections',
-                        onTap: () => context.go('/collections'),
+                        onTap: () => context.push('/collections'),
                       ),
                     ),
                   ],
@@ -355,8 +355,8 @@ class HomeScreen extends HookConsumerWidget {
                   ref
                       .read(searchHistoryProvider.notifier)
                       .addSearch(value.trim());
-                  Navigator.pop(context);
-                  context.go('/bookmarks');
+                  context.pop();
+                  Future.microtask(() => context.go('/bookmarks')); //*
                 }
               },
             ),
@@ -366,13 +366,8 @@ class HomeScreen extends HookConsumerWidget {
               children: [
                 TextButton.icon(
                   onPressed: () {
-                    Navigator.pop(context);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const AdvancedSearchScreen(),
-                      ),
-                    );
+                    context.pop();
+                    context.push('/advanced_search');
                   },
                   icon: const Icon(Icons.tune_rounded),
                   label: const Text('Advanced'),
@@ -383,7 +378,7 @@ class HomeScreen extends HookConsumerWidget {
                     if (query.isNotEmpty) {
                       ref.read(bookmarkListProvider.notifier).search(query);
                       ref.read(searchHistoryProvider.notifier).addSearch(query);
-                      Navigator.pop(context);
+                      context.pop();
                       context.go('/bookmarks');
                     }
                   },

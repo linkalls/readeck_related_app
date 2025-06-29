@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../bookmark_detail_screen.dart';
-import '../modern_bookmarks_screen.dart';
+import '../bookmarks_screen.dart';
+import '../collections_screen.dart';
+import '../labels_screen.dart';
 import '../screens/screens.dart';
 
 final router = GoRouter(
@@ -134,5 +136,9 @@ final router = GoRouter(
       builder: (context, state) => const SettingsScreen(),
     ),
     GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
+    GoRoute(
+      path: '/advanced_search',
+      builder: (context, state) => const AdvancedSearchScreen(),
+    ),
   ],
 );

@@ -5,6 +5,7 @@ import 'package:readeck_client/readeck_client.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../providers/providers.dart';
+import '../services/database_service.dart';
 import '../utils/api_client.dart';
 
 class NavCard extends StatelessWidget {
@@ -334,9 +335,8 @@ class BookmarkCard extends ConsumerWidget {
       final api = await getApiClient();
       final markdownContent = await api.exportBookmark(bookmark.id!, "md");
 
-      // キャッシュに保存
-      final cacheNotifier = ref.read(offlineCacheProvider.notifier);
-      await cacheNotifier.cacheBookmarkContent(bookmark.id!, markdownContent);
+      // SQLiteに保存（DatabaseServiceを利用）
+      await DatabaseService.saveBookmarkContent(bookmark.id!, markdownContent);
 
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

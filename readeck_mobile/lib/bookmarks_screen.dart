@@ -5,9 +5,11 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:readeck_client/readeck_client.dart';
+import "package:go_router/go_router.dart";
 
 import 'providers/providers.dart';
 import 'utils/api_client.dart';
+
 
 class ModernBookmarksScreen extends HookConsumerWidget {
   const ModernBookmarksScreen({super.key});
@@ -77,8 +79,8 @@ class ModernBookmarksScreen extends HookConsumerWidget {
                   children: [
                     IconButton.filled(
                       onPressed: () {
-                        if (Navigator.of(context).canPop()) {
-                          Navigator.of(context).pop();
+                        if (context.canPop()) {
+                          context.pop();
                         } else {
                           context.go('/');
                         }
@@ -356,7 +358,7 @@ class ModernBookmarksScreen extends HookConsumerWidget {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => context.pop(),
             child: const Text('Cancel'),
           ),
           FilledButton(
@@ -374,7 +376,7 @@ class ModernBookmarksScreen extends HookConsumerWidget {
                   );
 
                   if (context.mounted) {
-                    Navigator.pop(context);
+                    context.pop();
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content: Text('Bookmark added successfully'),

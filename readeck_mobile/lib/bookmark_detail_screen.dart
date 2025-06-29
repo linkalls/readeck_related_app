@@ -1,5 +1,6 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:markdown_widget/markdown_widget.dart';
 import 'package:readeck_client/readeck_client.dart';
@@ -94,7 +95,7 @@ class BookmarkDetailScreen extends HookConsumerWidget {
                   child: Row(
                     children: [
                       IconButton.filled(
-                        onPressed: () => Navigator.pop(context),
+                        onPressed: () => context.pop(),
                         icon: const Icon(Icons.arrow_back_rounded),
                       ),
                       const SizedBox(width: 16),
@@ -135,7 +136,7 @@ class BookmarkDetailScreen extends HookConsumerWidget {
                               children: [
                                 Icon(Icons.share_rounded),
                                 SizedBox(width: 8),
-                                Text('共有'),
+                                Text('Share'),
                               ],
                             ),
                           ),
@@ -145,7 +146,7 @@ class BookmarkDetailScreen extends HookConsumerWidget {
                               children: [
                                 Icon(Icons.open_in_browser_rounded),
                                 SizedBox(width: 8),
-                                Text('ブラウザで開く'),
+                                Text('Open in Browser'),
                               ],
                             ),
                           ),
@@ -268,7 +269,7 @@ class BookmarkDetailScreen extends HookConsumerWidget {
                       child: Row(
                         children: [
                           IconButton.filled(
-                            onPressed: () => Navigator.pop(context),
+                            onPressed: () => context.pop(),
                             icon: const Icon(Icons.arrow_back_rounded),
                           ),
                           const SizedBox(width: 16),
