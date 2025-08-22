@@ -64,7 +64,7 @@ class ReadeckApp extends ConsumerWidget {
     final themeMode = ref.watch(themeProvider);
 
     // 共有サービスを監視して初期化
-    final sharingService = ref.watch(sharingServiceProvider.notifier);
+    // final sharingService = ref.watch(sharingServiceProvider.notifier);
 
     // 共有インテントから起動された場合はローディング画面のみ表示
     if (initialSharedText != null && initialSharedText!.isNotEmpty) {
