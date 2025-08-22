@@ -34,204 +34,206 @@ class LoginScreen extends HookConsumerWidget {
           ),
         ),
         child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.primary,
-                    borderRadius: BorderRadius.circular(24),
-                  ),
-                  child: Icon(
-                    Icons.bookmark_rounded,
-                    size: 48,
-                    color: theme.colorScheme.onPrimary,
-                  ),
-                ),
-                const SizedBox(height: 32),
-                Text(
-                  'Welcome to Readeck',
-                  style: theme.textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Sign in to access your bookmarks',
-                  style: theme.textTheme.bodyLarge?.copyWith(
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
-                  ),
-                ),
-                const SizedBox(height: 48),
-                Card(
-                  child: Padding(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
                     padding: const EdgeInsets.all(24),
-                    child: Form(
-                      key: formKey,
-                      child: Column(
-                        children: [
-                          TextFormField(
-                            controller: serverUrlController,
-                            decoration: const InputDecoration(
-                              labelText: 'Server URL',
-                              prefixIcon: Icon(Icons.dns_rounded),
-                              border: OutlineInputBorder(),
-                            ),
-                            validator: (v) =>
-                                v == null || v.isEmpty ? 'Required' : null,
-                          ),
-                          const SizedBox(height: 16),
-                          TextFormField(
-                            controller: usernameController,
-                            decoration: const InputDecoration(
-                              labelText: 'Username',
-                              prefixIcon: Icon(Icons.person_rounded),
-                              border: OutlineInputBorder(),
-                            ),
-                            validator: (v) =>
-                                v == null || v.isEmpty ? 'Required' : null,
-                          ),
-                          const SizedBox(height: 16),
-                          TextFormField(
-                            controller: passwordController,
-                            decoration: const InputDecoration(
-                              labelText: 'Password',
-                              prefixIcon: Icon(Icons.lock_rounded),
-                              border: OutlineInputBorder(),
-                            ),
-                            obscureText: true,
-                            validator: (v) =>
-                                v == null || v.isEmpty ? 'Required' : null,
-                          ),
-                          const SizedBox(height: 24),
-                          if (state.error != null) ...[
-                            Container(
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: theme.colorScheme.errorContainer,
-                                borderRadius: BorderRadius.circular(8),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primary,
+                      borderRadius: BorderRadius.circular(24),
+                    ),
+                    child: Icon(
+                      Icons.bookmark_rounded,
+                      size: 48,
+                      color: theme.colorScheme.onPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+                  Text(
+                    'Welcome to Readeck',
+                    style: theme.textTheme.headlineMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Sign in to access your bookmarks',
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                    ),
+                  ),
+                  const SizedBox(height: 48),
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Form(
+                        key: formKey,
+                        child: Column(
+                          children: [
+                            TextFormField(
+                              controller: serverUrlController,
+                              decoration: const InputDecoration(
+                                labelText: 'Server URL',
+                                prefixIcon: Icon(Icons.dns_rounded),
+                                border: OutlineInputBorder(),
                               ),
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.error_outline_rounded,
-                                    color: theme.colorScheme.error,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: Text(
-                                      state.error!,
-                                      style: TextStyle(
-                                        color:
-                                            theme.colorScheme.onErrorContainer,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
+                              validator: (v) =>
+                                  v == null || v.isEmpty ? 'Required' : null,
                             ),
                             const SizedBox(height: 16),
-                          ],
-                          SizedBox(
-                            width: double.infinity,
-                            child: FilledButton(
-                              onPressed: state.isLoading
-                                  ? null
-                                  : () async {
-                                      if (!(formKey.currentState?.validate() ??
-                                          false)) {
-                                        return;
-                                      }
-                                      notifier.state = state.copyWith(
-                                        isLoading: true,
-                                        error: null,
-                                      );
-
-                                      final rawUrl = serverUrlController.text
-                                          .trim();
-                                      final username = usernameController.text
-                                          .trim();
-                                      final password = passwordController.text;
-
-                                      var normalizedUrl = rawUrl;
-                                      if (!RegExp(
-                                        r'https?://',
-                                      ).hasMatch(normalizedUrl)) {
-                                        normalizedUrl = 'http://$normalizedUrl';
-                                      }
-                                      if (normalizedUrl.endsWith('/')) {
-                                        normalizedUrl = normalizedUrl.substring(
-                                          0,
-                                          normalizedUrl.length - 1,
+                            TextFormField(
+                              controller: usernameController,
+                              decoration: const InputDecoration(
+                                labelText: 'Username',
+                                prefixIcon: Icon(Icons.person_rounded),
+                                border: OutlineInputBorder(),
+                              ),
+                              validator: (v) =>
+                                  v == null || v.isEmpty ? 'Required' : null,
+                            ),
+                            const SizedBox(height: 16),
+                            TextFormField(
+                              controller: passwordController,
+                              decoration: const InputDecoration(
+                                labelText: 'Password',
+                                prefixIcon: Icon(Icons.lock_rounded),
+                                border: OutlineInputBorder(),
+                              ),
+                              obscureText: true,
+                              validator: (v) =>
+                                  v == null || v.isEmpty ? 'Required' : null,
+                            ),
+                            const SizedBox(height: 24),
+                            if (state.error != null) ...[
+                              Container(
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: theme.colorScheme.errorContainer,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.error_outline_rounded,
+                                      color: theme.colorScheme.error,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Text(
+                                        state.error!,
+                                        style: TextStyle(
+                                          color:
+                                              theme.colorScheme.onErrorContainer,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                            ],
+                            SizedBox(
+                              width: double.infinity,
+                              child: FilledButton(
+                                onPressed: state.isLoading
+                                    ? null
+                                    : () async {
+                                        if (!(formKey.currentState?.validate() ??
+                                            false)) {
+                                          return;
+                                        }
+                                        notifier.state = state.copyWith(
+                                          isLoading: true,
+                                          error: null,
                                         );
-                                      }
 
-                                      try {
-                                        final client = ReadeckApiClient(
-                                          baseUrl: normalizedUrl,
-                                        );
-                                        final res = await client.login(
-                                          AuthRequest(
-                                            username: username,
-                                            password: password,
-                                            application: 'readeck_mobile',
-                                          ),
-                                        );
-                                        if (res.token == null) {
-                                          throw Exception('No token');
+                                        final rawUrl = serverUrlController.text
+                                            .trim();
+                                        final username = usernameController.text
+                                            .trim();
+                                        final password = passwordController.text;
+
+                                        var normalizedUrl = rawUrl;
+                                        if (!RegExp(
+                                          r'https?://',
+                                        ).hasMatch(normalizedUrl)) {
+                                          normalizedUrl = 'http://$normalizedUrl';
+                                        }
+                                        if (normalizedUrl.endsWith('/')) {
+                                          normalizedUrl = normalizedUrl.substring(
+                                            0,
+                                            normalizedUrl.length - 1,
+                                          );
                                         }
 
-                                        setGlobalApiClient(
-                                          normalizedUrl,
-                                          res.token!,
-                                        );
-                                        ref
-                                            .read(authTokenProvider.notifier)
-                                            .state = res
-                                            .token;
-                                        final prefs =
-                                            await SharedPreferences.getInstance();
-                                        await prefs.setString(
-                                          'serverUrl',
-                                          normalizedUrl,
-                                        );
-                                        await prefs.setString(
-                                          'token',
-                                          res.token!,
-                                        );
+                                        try {
+                                          final client = ReadeckApiClient(
+                                            baseUrl: normalizedUrl,
+                                          );
+                                          final res = await client.login(
+                                            AuthRequest(
+                                              username: username,
+                                              password: password,
+                                              application: 'readeck_mobile',
+                                            ),
+                                          );
+                                          if (res.token == null) {
+                                            throw Exception('No token');
+                                          }
 
-                                        if (context.mounted) context.go('/');
-                                      } catch (e) {
+                                          setGlobalApiClient(
+                                            normalizedUrl,
+                                            res.token!,
+                                          );
+                                          ref
+                                              .read(authTokenProvider.notifier)
+                                              .state = res
+                                              .token;
+                                          final prefs =
+                                              await SharedPreferences.getInstance();
+                                          await prefs.setString(
+                                            'serverUrl',
+                                            normalizedUrl,
+                                          );
+                                          await prefs.setString(
+                                            'token',
+                                            res.token!,
+                                          );
+
+                                          if (context.mounted) context.go('/');
+                                        } catch (e) {
+                                          notifier.state = state.copyWith(
+                                            isLoading: false,
+                                            error: e.toString(),
+                                          );
+                                          return;
+                                        }
                                         notifier.state = state.copyWith(
                                           isLoading: false,
-                                          error: e.toString(),
                                         );
-                                        return;
-                                      }
-                                      notifier.state = state.copyWith(
-                                        isLoading: false,
-                                      );
-                                    },
-                              child: state.isLoading
-                                  ? const SizedBox(
-                                      height: 20,
-                                      width: 20,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                      ),
-                                    )
-                                  : const Text('Sign In'),
+                                      },
+                                child: state.isLoading
+                                    ? const SizedBox(
+                                        height: 20,
+                                        width: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                        ),
+                                      )
+                                    : const Text('Sign In'),
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

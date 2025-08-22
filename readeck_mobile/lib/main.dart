@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'l10n/app_localizations.dart';
 
 import 'config/router.dart';
 import 'providers/providers.dart';
@@ -32,7 +33,7 @@ class ReadeckApp extends ConsumerWidget {
     ref.watch(sharingServiceProvider);
 
     return MaterialApp.router(
-      title: 'Readeck Mobile',
+      onGenerateTitle: (context) => AppLocalizations.of(context)!.appTitle,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
           seedColor: Colors.deepPurple,
@@ -65,6 +66,8 @@ class ReadeckApp extends ConsumerWidget {
       ),
       themeMode: ThemeMode.system,
       routerConfig: router,
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       builder: (context, child) {
         return autoLoginAsync.when(
           data: (isLoggedIn) {
