@@ -5,7 +5,6 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:readeck_client/readeck_client.dart';
-import "package:go_router/go_router.dart";
 
 import 'providers/providers.dart';
 import 'utils/api_client.dart';

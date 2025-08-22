@@ -3,7 +3,9 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../providers/locale_provider.dart';
+import '../providers/providers.dart';
 import '../providers/theme_provider.dart';
+import '../utils/api_client.dart';
 
 class SettingsScreen extends HookConsumerWidget {
   const SettingsScreen({super.key});
@@ -76,8 +78,107 @@ class SettingsScreen extends HookConsumerWidget {
                             leading: const Icon(Icons.logout_rounded),
                             title: const Text('Logout'),
                             subtitle: const Text('Sign out from your account'),
-                            onTap: () {
-                              // TODO: ログアウト処理
+                            onTap: () async {
+                              // ローディング状態を示すスナックバーを表示
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Row(
+                                    children: [
+                                      SizedBox(
+                                        height: 16,
+                                        width: 16,
+                                        child: CircularProgressIndicator(strokeWidth: 2),
+                                      ),
+                                      SizedBox(width: 16),
+                                      Text('Preparing logout...'),
+                                    ],
+                                  ),
+                                  duration: Duration(seconds: 1),
+                                ),
+                              );
+                              
+                              // 少し待ってからダイアログを表示（UXの改善）
+                              await Future.delayed(const Duration(milliseconds: 300));
+                              
+                              // ローディングスナックバーを隠す
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                              }
+                              
+                              // ログアウト確認ダイアログを表示
+                              final shouldLogout = await showDialog<bool>(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  title: const Text('Logout'),
+                                  content: const Text('Are you sure you want to sign out?'),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.of(context).pop(false),
+                                      child: const Text('Cancel'),
+                                    ),
+                                    TextButton(
+                                      onPressed: () => Navigator.of(context).pop(true),
+                                      child: const Text('Logout'),
+                                    ),
+                                  ],
+                                ),
+                              );
+                              
+                              if (shouldLogout == true) {
+                                // ログアウト処理中を表示
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Row(
+                                        children: [
+                                          SizedBox(
+                                            height: 16,
+                                            width: 16,
+                                            child: CircularProgressIndicator(strokeWidth: 2),
+                                          ),
+                                          SizedBox(width: 16),
+                                          Text('Logging out...'),
+                                        ],
+                                      ),
+                                      duration: Duration(seconds: 5),
+                                    ),
+                                  );
+                                }
+                                
+                                try {
+                                  final api = await getApiClient();
+                                  await api.logout();
+                                  
+                                  // 設定をクリア
+                                  final clearSettings = ref.read(clearSettingsProvider);
+                                  await clearSettings();
+                                  
+                                  // ホーム画面に戻る
+                                  if (context.mounted) {
+                                    context.go('/');
+                                  }
+                                  
+                                  // 成功メッセージを表示
+                                  if (context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('Successfully logged out'),
+                                        backgroundColor: Colors.green,
+                                      ),
+                                    );
+                                  }
+                                } catch (e) {
+                                  // エラーハンドリング
+                                  if (context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('Logout failed: $e'),
+                                        backgroundColor: Colors.red,
+                                      ),
+                                    );
+                                  }
+                                }
+                              }
                             },
                           ),
                         ],

@@ -40,3 +40,22 @@ final autoLoginProvider = FutureProvider<bool>((ref) async {
     return false;
   }
 });
+
+// 設定クリア用プロバイダー
+final clearSettingsProvider = Provider<Future<void> Function()>((ref) {
+  return () async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.clear();
+      
+      // 認証状態をリセット
+      ref.read(authTokenProvider.notifier).state = null;
+      ref.read(loginStateProvider.notifier).state = LoginState.initial();
+      
+      // グローバルAPIクライアントをクリア
+      clearGlobalApiClient();
+    } catch (e) {
+      throw Exception('Failed to clear settings: $e');
+    }
+  };
+});

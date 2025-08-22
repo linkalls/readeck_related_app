@@ -22,10 +22,11 @@ class HomeScreen extends HookConsumerWidget {
               children: [
                 const Icon(Icons.error_outline, color: Colors.white),
                 const SizedBox(width: 8),
-                Expanded(child: Text('Failed to save bookmark: ${next.error}')),
+                Expanded(child: Text(next.error!)),
               ],
             ),
             backgroundColor: Colors.red,
+            duration: Duration(seconds: next.isFromShareIntent ? 8 : 5),
             action: SnackBarAction(
               label: 'Dismiss',
               textColor: Colors.white,
@@ -36,24 +37,72 @@ class HomeScreen extends HookConsumerWidget {
         );
       }
 
+      // 処理中の表示
+      if (previous?.isProcessing == false && next.isProcessing == true) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Text(
+                    next.isFromShareIntent
+                        ? 'ブックマークを保存中...'
+                        : 'Creating bookmark...',
+                  ),
+                ),
+              ],
+            ),
+            backgroundColor: Colors.blue,
+            duration: const Duration(seconds: 10),
+          ),
+        );
+      }
+
       // 処理が完了した場合（成功の場合）
       if (previous?.isProcessing == true &&
           next.isProcessing == false &&
-          next.error == null &&
-          (next.sharedText != null || next.sharedFiles.isNotEmpty)) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Row(
-              children: [
-                Icon(Icons.bookmark_added, color: Colors.white),
-                SizedBox(width: 8),
-                Expanded(child: Text('Bookmark saved successfully!')),
-              ],
+          next.error == null) {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
+        // 共有インテントから起動された場合は特別なメッセージ
+        if (next.isFromShareIntent && next.shouldAutoClose) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Row(
+                children: [
+                  Icon(Icons.bookmark_added, color: Colors.white),
+                  SizedBox(width: 8),
+                  Expanded(child: Text('ブックマーク保存完了！アプリを閉じます...')),
+                ],
+              ),
+              backgroundColor: Colors.green,
+              duration: Duration(seconds: 2),
             ),
-            backgroundColor: Colors.green,
-            duration: const Duration(seconds: 2),
-          ),
-        );
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Row(
+                children: [
+                  Icon(Icons.bookmark_added, color: Colors.white),
+                  SizedBox(width: 8),
+                  Expanded(child: Text('Bookmark saved successfully!')),
+                ],
+              ),
+              backgroundColor: Colors.green,
+              duration: Duration(seconds: 3),
+            ),
+          );
+        }
 
         // ブックマークリストを更新
         ref.invalidate(bookmarksProvider);

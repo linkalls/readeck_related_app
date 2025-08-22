@@ -16,12 +16,23 @@ Future<ReadeckApiClient> getApiClient() async {
   if (globalApiClient != null) {
     return globalApiClient!;
   }
+
   final prefs = await SharedPreferences.getInstance();
-  final serverUrl = prefs.getString('serverUrl') ?? '';
+  final serverUrl = prefs.getString('serverUrl');
   final token = prefs.getString('token');
-  if (serverUrl.isEmpty || token == null) {
-    throw Exception('Not logged in');
+
+  if (serverUrl == null || serverUrl.isEmpty) {
+    throw Exception('サーバーURLが設定されていません。アプリでサーバー設定を行ってください。');
   }
-  globalApiClient = ReadeckApiClient(baseUrl: serverUrl, token: token);
-  return globalApiClient!;
+
+  if (token == null || token.isEmpty) {
+    throw Exception('認証トークンがありません。アプリでログインしてください。');
+  }
+
+  try {
+    globalApiClient = ReadeckApiClient(baseUrl: serverUrl, token: token);
+    return globalApiClient!;
+  } catch (e) {
+    throw Exception('APIクライアントの初期化に失敗しました: $e');
+  }
 }
