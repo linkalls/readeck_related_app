@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+
 import '../services/sharing_service.dart';
 
 class ShareLoadingScreen extends ConsumerWidget {
@@ -9,7 +10,8 @@ class ShareLoadingScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final sharingState = ref.watch(sharingServiceProvider);
-    final isError = sharingState.error != null && sharingState.error!.isNotEmpty;
+    final isError =
+        sharingState.error != null && sharingState.error!.isNotEmpty;
     final isDone = !sharingState.isProcessing && !isError;
 
     return Scaffold(
@@ -34,25 +36,25 @@ class ShareLoadingScreen extends ConsumerWidget {
                 ],
               )
             : isDone
-                ? Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.check_circle, color: Colors.green, size: 48),
-                      const SizedBox(height: 16),
-                      const Text('保存完了', style: TextStyle(fontSize: 18)),
-                    ],
-                  )
-                : Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      LoadingAnimationWidget.fourRotatingDots(
-                        color: Theme.of(context).primaryColor,
-                        size: 64,
-                      ),
-                      const SizedBox(height: 24),
-                      const Text('保存中...', style: TextStyle(fontSize: 18)),
-                    ],
+            ? Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.check_circle, color: Colors.green, size: 48),
+                  const SizedBox(height: 16),
+                  const Text('保存完了', style: TextStyle(fontSize: 18)),
+                ],
+              )
+            : Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  LoadingAnimationWidget.fourRotatingDots(
+                    color: Theme.of(context).primaryColor,
+                    size: 64,
                   ),
+                  const SizedBox(height: 24),
+                  const Text('保存中...', style: TextStyle(fontSize: 18)),
+                ],
+              ),
       ),
     );
   }

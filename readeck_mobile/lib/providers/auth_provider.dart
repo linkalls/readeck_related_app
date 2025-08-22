@@ -47,11 +47,11 @@ final clearSettingsProvider = Provider<Future<void> Function()>((ref) {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.clear();
-      
+
       // 認証状態をリセット
       ref.read(authTokenProvider.notifier).state = null;
       ref.read(loginStateProvider.notifier).state = LoginState.initial();
-      
+
       // グローバルAPIクライアントをクリア
       clearGlobalApiClient();
     } catch (e) {

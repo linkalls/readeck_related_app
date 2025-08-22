@@ -87,7 +87,9 @@ class SettingsScreen extends HookConsumerWidget {
                                       SizedBox(
                                         height: 16,
                                         width: 16,
-                                        child: CircularProgressIndicator(strokeWidth: 2),
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                        ),
                                       ),
                                       SizedBox(width: 16),
                                       Text('Preparing logout...'),
@@ -96,34 +98,42 @@ class SettingsScreen extends HookConsumerWidget {
                                   duration: Duration(seconds: 1),
                                 ),
                               );
-                              
+
                               // 少し待ってからダイアログを表示（UXの改善）
-                              await Future.delayed(const Duration(milliseconds: 300));
-                              
+                              await Future.delayed(
+                                const Duration(milliseconds: 300),
+                              );
+
                               // ローディングスナックバーを隠す
                               if (context.mounted) {
-                                ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                                ScaffoldMessenger.of(
+                                  context,
+                                ).hideCurrentSnackBar();
                               }
-                              
+
                               // ログアウト確認ダイアログを表示
                               final shouldLogout = await showDialog<bool>(
                                 context: context,
                                 builder: (context) => AlertDialog(
                                   title: const Text('Logout'),
-                                  content: const Text('Are you sure you want to sign out?'),
+                                  content: const Text(
+                                    'Are you sure you want to sign out?',
+                                  ),
                                   actions: [
                                     TextButton(
-                                      onPressed: () => Navigator.of(context).pop(false),
+                                      onPressed: () =>
+                                          Navigator.of(context).pop(false),
                                       child: const Text('Cancel'),
                                     ),
                                     TextButton(
-                                      onPressed: () => Navigator.of(context).pop(true),
+                                      onPressed: () =>
+                                          Navigator.of(context).pop(true),
                                       child: const Text('Logout'),
                                     ),
                                   ],
                                 ),
                               );
-                              
+
                               if (shouldLogout == true) {
                                 // ログアウト処理中を表示
                                 if (context.mounted) {
@@ -134,7 +144,9 @@ class SettingsScreen extends HookConsumerWidget {
                                           SizedBox(
                                             height: 16,
                                             width: 16,
-                                            child: CircularProgressIndicator(strokeWidth: 2),
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                            ),
                                           ),
                                           SizedBox(width: 16),
                                           Text('Logging out...'),
@@ -144,25 +156,29 @@ class SettingsScreen extends HookConsumerWidget {
                                     ),
                                   );
                                 }
-                                
+
                                 try {
                                   final api = await getApiClient();
                                   await api.logout();
-                                  
+
                                   // 設定をクリア
-                                  final clearSettings = ref.read(clearSettingsProvider);
+                                  final clearSettings = ref.read(
+                                    clearSettingsProvider,
+                                  );
                                   await clearSettings();
-                                  
+
                                   // ホーム画面に戻る
                                   if (context.mounted) {
                                     context.go('/');
                                   }
-                                  
+
                                   // 成功メッセージを表示
                                   if (context.mounted) {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
-                                        content: Text('Successfully logged out'),
+                                        content: Text(
+                                          'Successfully logged out',
+                                        ),
                                         backgroundColor: Colors.green,
                                       ),
                                     );
@@ -202,19 +218,19 @@ class SettingsScreen extends HookConsumerWidget {
                           ListTile(
                             leading: const Icon(Icons.language_rounded),
                             title: const Text('Language'),
-                            subtitle: Text(
-                              (Locale? locale) {
-                                if (locale == null) return 'System Default';
-                                if (locale.languageCode == 'ja') return '日本語';
-                                if (locale.languageCode == 'en') return 'English';
-                                return 'Unknown';
-                              }(ref.watch(localeProvider)),
-                            ),
+                            subtitle: Text((Locale? locale) {
+                              if (locale == null) return 'System Default';
+                              if (locale.languageCode == 'ja') return '日本語';
+                              if (locale.languageCode == 'en') return 'English';
+                              return 'Unknown';
+                            }(ref.watch(localeProvider))),
                             onTap: () {
                               showDialog(
                                 context: context,
                                 builder: (context) {
-                                  final currentLocale = ref.watch(localeProvider);
+                                  final currentLocale = ref.watch(
+                                    localeProvider,
+                                  );
                                   return AlertDialog(
                                     title: const Text('Select Language'),
                                     content: Column(
@@ -270,18 +286,16 @@ class SettingsScreen extends HookConsumerWidget {
                           ListTile(
                             leading: const Icon(Icons.brightness_6_rounded),
                             title: const Text('Theme'),
-                            subtitle: Text(
-                              (ThemeMode themeMode) {
-                                switch (themeMode) {
-                                  case ThemeMode.light:
-                                    return 'Light';
-                                  case ThemeMode.dark:
-                                    return 'Dark';
-                                  case ThemeMode.system:
-                                    return 'System Default';
-                                }
-                              }(ref.watch(themeProvider)),
-                            ),
+                            subtitle: Text((ThemeMode themeMode) {
+                              switch (themeMode) {
+                                case ThemeMode.light:
+                                  return 'Light';
+                                case ThemeMode.dark:
+                                  return 'Dark';
+                                case ThemeMode.system:
+                                  return 'System Default';
+                              }
+                            }(ref.watch(themeProvider))),
                             onTap: () {
                               showDialog(
                                 context: context,

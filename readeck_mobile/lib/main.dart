@@ -71,9 +71,17 @@ class ReadeckApp extends ConsumerWidget {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         sharingService.handleInitialSharedText(initialSharedText!);
       });
-      return const MaterialApp(
+      return MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: ShareLoadingScreen(),
+        theme: ThemeData(
+          scaffoldBackgroundColor: Colors.white,
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: Colors.deepPurple,
+            brightness: Brightness.light,
+          ),
+          useMaterial3: true,
+        ),
+        home: const ShareLoadingScreen(),
       );
     }
 
