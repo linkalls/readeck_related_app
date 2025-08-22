@@ -4,11 +4,35 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 import '../services/sharing_service.dart';
 
-class ShareLoadingScreen extends ConsumerWidget {
-  const ShareLoadingScreen({super.key});
+class ShareLoadingScreen extends ConsumerStatefulWidget {
+  final String sharedText;
+  const ShareLoadingScreen({super.key, required this.sharedText});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ShareLoadingScreen> createState() => _ShareLoadingScreenState();
+}
+
+class _ShareLoadingScreenState extends ConsumerState<ShareLoadingScreen> {
+  bool _started = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_started) {
+      // ローディング画面を確実に表示してから保存処理を開始（短縮）
+      Future.delayed(const Duration(milliseconds: 200), () {
+        if (mounted) {
+          ref
+              .read(sharingServiceProvider.notifier)
+              .handleInitialSharedText(widget.sharedText);
+        }
+      });
+      _started = true;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final sharingState = ref.watch(sharingServiceProvider);
     final isError =
         sharingState.error != null && sharingState.error!.isNotEmpty;

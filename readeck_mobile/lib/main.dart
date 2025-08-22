@@ -68,9 +68,6 @@ class ReadeckApp extends ConsumerWidget {
 
     // 共有インテントから起動された場合はローディング画面のみ表示
     if (initialSharedText != null && initialSharedText!.isNotEmpty) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        sharingService.handleInitialSharedText(initialSharedText!);
-      });
       return MaterialApp(
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
@@ -81,7 +78,7 @@ class ReadeckApp extends ConsumerWidget {
           ),
           useMaterial3: true,
         ),
-        home: const ShareLoadingScreen(),
+        home: ShareLoadingScreen(sharedText: initialSharedText!),
       );
     }
 

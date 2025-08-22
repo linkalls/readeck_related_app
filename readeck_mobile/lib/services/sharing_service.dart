@@ -202,10 +202,13 @@ class SharingService extends StateNotifier<SharingState> {
 
       print('🔗 Creating bookmark for URL: $url');
 
-      // UIをブロックしないように分割して処理
-      await Future.delayed(const Duration(milliseconds: 50)); // UIに制御を戻す
+      // UIをブロックしないように更に細かく分割
+      await Future.delayed(const Duration(milliseconds: 100));
 
       final api = await getApiClient();
+
+      // さらにUI制御を戻す
+      await Future.delayed(const Duration(milliseconds: 50));
 
       // ブックマーク作成を非同期で実行
       final bookmark = await api.createBookmark(
