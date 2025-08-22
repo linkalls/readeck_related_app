@@ -4,6 +4,10 @@ import 'package:readeck_client/readeck_client.dart';
 import '../utils/api_client.dart';
 import 'offline_cache_provider.dart';
 
+enum BookmarkFilter { all, unread, reading, read }
+
+enum BookmarkSort { dateAddedDesc, dateAddedAsc, titleAsc, titleDesc }
+
 // ブックマーク一覧の状態管理
 class BookmarkListState {
   final List<BookmarkSummary> bookmarks;
@@ -11,6 +15,8 @@ class BookmarkListState {
   final int offset;
   final bool hasMore;
   final bool isLoading;
+  final BookmarkFilter filter;
+  final BookmarkSort sort;
 
   const BookmarkListState({
     this.bookmarks = const [],
@@ -18,6 +24,8 @@ class BookmarkListState {
     this.offset = 0,
     this.hasMore = true,
     this.isLoading = false,
+    this.filter = BookmarkFilter.all,
+    this.sort = BookmarkSort.dateAddedDesc,
   });
 
   BookmarkListState copyWith({
@@ -26,6 +34,8 @@ class BookmarkListState {
     int? offset,
     bool? hasMore,
     bool? isLoading,
+    BookmarkFilter? filter,
+    BookmarkSort? sort,
   }) {
     return BookmarkListState(
       bookmarks: bookmarks ?? this.bookmarks,
@@ -33,6 +43,8 @@ class BookmarkListState {
       offset: offset ?? this.offset,
       hasMore: hasMore ?? this.hasMore,
       isLoading: isLoading ?? this.isLoading,
+      filter: filter ?? this.filter,
+      sort: sort ?? this.sort,
     );
   }
 }
@@ -57,10 +69,20 @@ class BookmarkListNotifier extends StateNotifier<BookmarkListState> {
     }
     try {
       final api = await getApiClient();
+
+      List<String>? readStatus;
+      if (state.filter != BookmarkFilter.all) {
+        readStatus = [state.filter.name];
+      }
+
+      // TODO: Add sorting to API call when available
+      // final sortString = state.sort.name; // e.g. 'dateAddedDesc' -> '-date_added'
+
       final newBookmarks = await api.listBookmarks(
         limit: pageSize,
         offset: state.offset,
         search: state.query.isNotEmpty ? state.query : null,
+        readStatus: readStatus,
       );
 
       final allBookmarks = reset
@@ -91,6 +113,16 @@ class BookmarkListNotifier extends StateNotifier<BookmarkListState> {
 
   void clearSearch() {
     state = state.copyWith(query: '');
+    loadBookmarks(reset: true);
+  }
+
+  void changeFilter(BookmarkFilter newFilter) {
+    state = state.copyWith(filter: newFilter);
+    loadBookmarks(reset: true);
+  }
+
+  void changeSort(BookmarkSort newSort) {
+    state = state.copyWith(sort: newSort);
     loadBookmarks(reset: true);
   }
 }

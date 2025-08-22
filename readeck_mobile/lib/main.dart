@@ -9,6 +9,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'config/router.dart';
 import 'l10n/app_localizations.dart';
+import 'providers/locale_provider.dart';
+import 'providers/theme_provider.dart';
 import 'providers/providers.dart';
 import 'screens/screens.dart';
 import 'services/database_service.dart';
@@ -126,11 +128,14 @@ class ReadeckApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final token = ref.watch(authTokenProvider);
     final autoLoginAsync = ref.watch(autoLoginProvider);
+    final locale = ref.watch(localeProvider);
+    final themeMode = ref.watch(themeProvider);
 
     // 共有サービスを監視して初期化
     ref.watch(sharingServiceProvider);
 
     return MaterialApp.router(
+      locale: locale,
       onGenerateTitle: (context) => AppLocalizations.of(context)!.appTitle,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
@@ -162,7 +167,7 @@ class ReadeckApp extends ConsumerWidget {
         appBarTheme: const AppBarTheme(centerTitle: true, elevation: 0),
         brightness: Brightness.dark,
       ),
-      themeMode: ThemeMode.system,
+      themeMode: themeMode,
       routerConfig: router,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,

@@ -95,6 +95,27 @@ class ModernBookmarksScreen extends HookConsumerWidget {
                             ?.copyWith(fontWeight: FontWeight.bold),
                       ),
                     ),
+                    PopupMenuButton<BookmarkSort>(
+                      icon: const Icon(Icons.sort_rounded),
+                      onSelected: (sort) => bookmarkListNotifier.changeSort(sort),
+                      itemBuilder: (context) => BookmarkSort.values
+                          .map(
+                            (sort) => PopupMenuItem(
+                              value: sort,
+                              child: Text(
+                                ((String s) =>
+                                    s[0].toUpperCase() + s.substring(1))(
+                                  sort.name.replaceAllMapped(
+                                    RegExp(r'([A-Z])'),
+                                    (match) => ' ${match.group(1)}',
+                                  ),
+                                ),
+                              ),
+                            ),
+                          )
+                          .toList(),
+                    ),
+                    const SizedBox(width: 8),
                     Text(
                       '${bookmarkListState.bookmarks.length} items',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -132,7 +153,35 @@ class ModernBookmarksScreen extends HookConsumerWidget {
                 ),
               ),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: 8),
+
+              // Filter chips
+              SizedBox(
+                height: 40,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  children: BookmarkFilter.values.map((filter) {
+                    final isSelected = bookmarkListState.filter == filter;
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 8.0),
+                      child: ChoiceChip(
+                        label: Text(
+                          filter.name[0].toUpperCase() + filter.name.substring(1),
+                        ),
+                        selected: isSelected,
+                        onSelected: (selected) {
+                          if (selected) {
+                            bookmarkListNotifier.changeFilter(filter);
+                          }
+                        },
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+
+              const SizedBox(height: 8),
 
               // ブックマークリスト
               Expanded(
