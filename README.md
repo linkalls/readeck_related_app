@@ -2,6 +2,8 @@
 
 This repository manages the Flutter application for Readeck.
 
+📘 **[User Guide](docs/USAGE.md)**
+
 ## Directory Structure
 
 - `readeck_client/`: API client library for Dart.
@@ -45,6 +47,8 @@ This repository manages the Flutter application for Readeck.
 - Login
 
 ## How to build
+
+For detailed usage instructions, please see the [User Guide](docs/USAGE.md).
 
 1. Set up Flutter ([official site](https://flutter.dev/))
 2. Install dependencies
